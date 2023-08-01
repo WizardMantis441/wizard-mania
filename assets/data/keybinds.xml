@@ -1,0 +1,6 @@
+<keybinds>
+    <bind main="A" alt="LEFT" />
+    <bind main="S" alt="DOWN" />
+    <bind main="K" alt="UP" />
+    <bind main="L" alt="RIGHT" />
+</keybinds>
