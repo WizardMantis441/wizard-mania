@@ -5,7 +5,7 @@ import flixel.util.FlxSignal.FlxTypedSignal;
 typedef BPMChange = {
     var bpm:Float;
     var time:Float;
-    var step:Int;
+    var step:Float;
 }
 
 class Conductor {
@@ -25,6 +25,33 @@ class Conductor {
     public static var curStep:Int = 0;
     public static var curBeat:Int = 0;
     public static var curMeasure:Int = 0;
+
+    public static function mapBPMChanges(song:ChartFormat) {
+        bpmChanges = [];
+
+        if(song == null || song.events == null) return;
+
+        var curBPM:Float = song.bpm;
+        var time:Float = 0;
+        var step:Float = 0;
+
+        for(e in song.events) {
+            if(e.name == "BPM Change" && e.parameters != null) {
+                if(Std.parseFloat(e.parameters[0]) == curBPM) continue;
+
+                var steps:Float = (e.time - time) / ((60 / curBPM) * 1000 / 4);
+                step += steps;
+                time = e.time;
+                curBPM = Std.parseFloat(e.parameters[0]);
+
+                bpmChanges.push({
+                    step: step,
+                    time: time,
+                    bpm: curBPM
+                });
+            }
+        }
+    }
     
 	public static function update(elapsed:Float) {
         songPosition += elapsed * 1000;
@@ -58,13 +85,13 @@ class Conductor {
     }
     
     public static function beatHit(curBeat:Int) {
-        onBeatHit.dispatch(curStep);
+        onBeatHit.dispatch(curBeat);
         if (curBeat % 4 == 0)
             measureHit(curMeasure);
     }
     
     public static function measureHit(curMeasure:Int) {
-        onMeasureHit.dispatch(curStep);
+        onMeasureHit.dispatch(curMeasure);
     }
 
     // backend
