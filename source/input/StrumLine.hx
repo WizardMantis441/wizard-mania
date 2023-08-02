@@ -88,40 +88,35 @@ class StrumLine extends FlxTypedSpriteGroup<Strum> {
 
 	private function keyDown(keyCode:KeyCode, keyMods:Int) {
 		var strumIndex:Int = -1;
-		for (i => bind in keybinds) {
+		for (i => bind in keybinds)
 			if (bind.contains(keyCode)) {
 				strumIndex = i;
 				break;
 			}
-		}
-		if(strumIndex == -1 || keysHeld[strumIndex] || cpu) return;
+
+		if (strumIndex == -1 || keysHeld[strumIndex] || cpu) return;
 		keysHeld[strumIndex] = true;
 
 		var queuedAnim:String = "press";
 
         // LITERALLY THE ENTIRE INPUT SYSTEM WTF from @Ne_Eo
-
+ 
 		var game = PlayState.self;
 		var hitzone = (500 / game.CHART.scrollSpeed);
 
-		// possible press notes
-		var ppnotes = notes.members
-		.filter((v)->v != null) // remove nulls
-		.filter((v)->{
-			return v.id == strumIndex; // filter for only current strum
-		}).filter((v)->{
-			return Math.abs(Conductor.songPosition - v.time) < hitzone; // get notes in hitzone
-		});
+		var ppnotes = notes.members // possible press notes
+		.filter((n)-> n != null) // remove null notes
+		.filter((n)-> n.id == strumIndex) // check only cur strum
+		.filter((n)-> Math.abs(Conductor.songPosition - n.time) < hitzone); // only in hitzone
 
-        // hit note
-		if (ppnotes.length > 0) {
+		if (ppnotes.length > 0) { // hit note
 			ppnotes.sort((a, b) -> Std.int(a.time - b.time));
-
-			var pppnote = ppnotes[0];
-
-			pppnote.destroy();
-			notes.remove(pppnote);
-
+		
+			for (b in ppnotes.filter(v->Math.abs(ppnotes[0].time - v.time) < 5)) {
+				b.destroy();
+				notes.remove(b);
+			}
+		
 			queuedAnim = "confirm";
 		}
 

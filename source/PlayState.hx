@@ -13,7 +13,7 @@ import openfl.utils.Assets;
 class PlayState extends FlxState {
 	public static var self:PlayState;
 
-	public var song:String = "ballistic-(hq)";
+	public var song:String = "quad quarrel";
 	public var difficulty:String = "hard";
 	
 	public var CHART:ChartFormat;
