@@ -4,8 +4,12 @@ import openfl.utils.Assets;
 import haxe.Json;
 
 class ChartParser {
-	public static function parse(song:String, difficulty:String) {
+	public static function parse(song:String, difficulty:String):ChartFormat {
         var raw:Dynamic = Json.parse(Assets.getText(Paths.json("songs/" + song.toLowerCase() + "/" + difficulty.toLowerCase())));
+
+		if (raw.codenameChart) {
+			return parseCNE(raw);
+		}
 
         var json:Dynamic = raw.song;
 		var parsed:ChartFormat = {
@@ -54,6 +58,17 @@ class ChartParser {
             curTime += curCrochet * 4;
 		}
 		parsed.notes.sort((a, b) -> Std.int(a.time - b.time));
+
+		return parsed;
+	}
+
+	public static function parseCNE(json) {
+		var parsed:ChartFormat = {
+			bpm: json.bpm,
+			scrollSpeed: json.speed,
+			notes: [],
+			events: []
+		};
 
 		return parsed;
 	}

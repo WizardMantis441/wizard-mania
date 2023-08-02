@@ -11,7 +11,7 @@ import openfl.utils.Assets;
 class PlayState extends FlxState {
 	public static var self:PlayState;
 
-	public var song:String = "fill up";
+	public var song:String = "ballistic-(hq)";
 	public var difficulty:String = "hard";
 	
 	public var CHART:ChartFormat;
@@ -37,7 +37,7 @@ class PlayState extends FlxState {
 
 		Conductor.onStepHit.add(stepHit);
 		Conductor.onBeatHit.add(beatHit);
-		Conductor.onMeasureHit.add(measureHit); 
+		Conductor.onMeasureHit.add(measureHit);
 		
 		cpuStrums = new StrumLine(FlxG.width * 0.25, 50, true);
 		add(cpuStrums);
@@ -64,6 +64,8 @@ class PlayState extends FlxState {
 		inst.loadEmbedded(Paths.songInst(song));
 		FlxG.sound.list.add(inst);
 
+		//Conductor.trackedSound = inst;
+
 		if (Assets.exists(Paths.songVoices(song))) {
 			voices = new FlxSound();
 			voices.loadEmbedded(Paths.songVoices(song));
@@ -73,7 +75,8 @@ class PlayState extends FlxState {
 	
 	override function update(elapsed:Float) {
 		super.update(elapsed);
-		Conductor.update(elapsed);
+		Conductor.songPosition = inst.time;
+		Conductor.updateTime();
 
 		if (!songStarted && Conductor.songPosition >= 0) {
 			Conductor.songPosition = 0;
@@ -89,18 +92,22 @@ class PlayState extends FlxState {
 		debugText.text += "\nMeasure: " + Conductor.curMeasure;
 	}
 
-	/*
-	public function stepHit(curStep:Int) {
-		voices.pause();
-
-		inst.play();
-		Conductor.songPosition = inst.time;
-		if (Conductor.songPosition <= voices.length) {
-			voices.time = Conductor.songPosition;
+	
+	/*public function stepHit(curStep:Int) {
+		if(Math.abs(Conductor.songPosition - inst.time) > 100) {
+			if(voices != null) voices.pause();
+	
+			inst.play();
+			Conductor.songPosition = inst.time;
+			if(voices != null) {
+				if (Conductor.songPosition <= voices.length) {
+					voices.time = Conductor.songPosition;
+				}
+				voices.play();
+			}
 		}
-		voices.play();
-	}
-	*/
+	}*/
+	
 
 	public function stepHit(curStep:Int) {}
 	public function beatHit(curBeat:Int) {}

@@ -1,6 +1,7 @@
 package backend;
 
 import flixel.util.FlxSignal.FlxTypedSignal;
+import flixel.system.FlxSound;
 
 typedef BPMChange = {
     var bpm:Float;
@@ -56,6 +57,10 @@ class Conductor {
 	public static function update(elapsed:Float) {
         songPosition += elapsed * 1000;
 
+        updateTime();
+	}
+
+    public static function updateTime() {
         var songPos:Float = songPosition;
         var bpmChange:BPMChange = {step: 0, time: 0, bpm: 0};
 		for (event in bpmChanges) {
@@ -76,7 +81,7 @@ class Conductor {
         
         if(oldStep != curStep)
             stepHit(curStep);
-	}
+    }
 
     public static function stepHit(curStep:Int) {
         onStepHit.dispatch(curStep);
