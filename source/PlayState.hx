@@ -33,6 +33,7 @@ class PlayState extends FlxState {
 
 		Conductor.mapBPMChanges(CHART);
 		Conductor.bpm = CHART.bpm;
+		trace("HEYYYYY " + CHART.bpm);
 
 		Conductor.onStepHit.add(stepHit);
 		Conductor.onBeatHit.add(beatHit);
@@ -82,24 +83,24 @@ class PlayState extends FlxState {
 				voices.play();
 		}
 
-		// code theft from psych enginr!!!
-		if (Math.abs(inst.time - Conductor.songPosition) > 20
-			|| (voices != null && Math.abs(voices.time - Conductor.songPosition) > 20)) {
-			voices.pause();
-
-			FlxG.sound.music.play();
-			Conductor.songPosition = inst.time;
-			if (Conductor.songPosition <= voices.length) {
-				voices.time = Conductor.songPosition;
-			}
-			voices.play();
-        }
-
 		debugText.text = "Position: " + Math.round(Conductor.songPosition) / 1000;
 		debugText.text += "\nStep: " + Conductor.curStep;
 		debugText.text += "\nBeat: " + Conductor.curBeat;
 		debugText.text += "\nMeasure: " + Conductor.curMeasure;
 	}
+
+	/*
+	public function stepHit(curStep:Int) {
+		voices.pause();
+
+		inst.play();
+		Conductor.songPosition = inst.time;
+		if (Conductor.songPosition <= voices.length) {
+			voices.time = Conductor.songPosition;
+		}
+		voices.play();
+	}
+	*/
 
 	public function stepHit(curStep:Int) {}
 	public function beatHit(curBeat:Int) {}

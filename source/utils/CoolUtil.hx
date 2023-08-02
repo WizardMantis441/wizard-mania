@@ -14,7 +14,7 @@ class CoolUtil {
 	 */
 	public inline static function keyToString(key:Null<lime.ui.KeyCode>):String {
 		return switch (key) {
-			case null, 0, UNKNOWN: "---";
+			case null, UNKNOWN: "---";
 			case LEFT: "←";
 			case DOWN: "↓";
 			case UP: "↑";

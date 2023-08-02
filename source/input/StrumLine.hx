@@ -20,106 +20,133 @@ import utils.CoolUtil;
 
 @:access(flixel.FlxCamera)
 class StrumLine extends FlxTypedSpriteGroup<Strum> {
-    // Note vars.
-    public var notes:FlxTypedGroup<Note>; //we might have to override draw
-    public var queuedNotes:Array<ChartNote> = []; //we gon create sprites over time baby!
+	// Note vars.
+	public var notes:FlxTypedGroup<Note>; //we might have to override draw
+	public var queuedNotes:Array<ChartNote> = []; //we gon create sprites over time baby!
 
-    // Input vars.
-    public var cpu:Bool = false;
-    public var keybinds:Array<Array<KeyCode>> = [];
-    public var keysHeld:Array<Bool> = [false, false, false, false];
-    
-    public var spacing:Float = 112; // 160 * 0.7
+	// Input vars.
+	public var cpu:Bool = false;
+	public var keybinds:Array<Array<KeyCode>> = [];
+	public var keysHeld:Array<Bool> = [false, false, false, false];
+	
+	public var spacing:Float = 112; // 160 * 0.7
 
-    public function new(?x:Float = 0, ?y:Float = 0, ?cpu:Bool = false) {
-        super(x, y);
-        this.cpu = cpu;
+	public function new(?x:Float = 0, ?y:Float = 0, ?cpu:Bool = false) {
+		super(x, y);
+		this.cpu = cpu;
 
-        for (id in 0...4) {
-            var strum = new Strum(spacing * id, 0, id);
-            strum.strumLine = this;
-            add(strum); 
-        }
+		for (id in 0...4) {
+			var strum = new Strum(spacing * id, 0, id);
+			strum.strumLine = this;
+			add(strum);
+		}
 
-        var xmlData = new Access(Xml.parse(Assets.getText(Paths.xml("data/keybinds"))).firstElement());
-        for(elem in xmlData.elements) {
-            if (elem.name != "bind") continue;
-            var keys = CoolUtil.limeKeyCodeFromStringMap;
+		var xmlData = new Access(Xml.parse(Assets.getText(Paths.xml("data/keybinds"))).firstElement());
+		for(elem in xmlData.elements) {
+			if (elem.name != "bind") continue;
+			var keys = CoolUtil.limeKeyCodeFromStringMap;
 
-            keybinds.push([
-                keys.get(elem.att.main),
-                keys.get(elem.att.alt)
-            ]);
-        }
+			keybinds.push([
+				keys.get(elem.att.main),
+				keys.get(elem.att.alt)
+			]);
+		}
 
-        this.x -= width / 2;
-        notes = new FlxTypedGroup();
+		this.x -= width / 2;
+		notes = new FlxTypedGroup();
 
-        Application.current.window.onKeyDown.add(keyDown);
-        Application.current.window.onKeyUp.add(keyUp);
-    }
+		Application.current.window.onKeyDown.add(keyDown);
+		Application.current.window.onKeyUp.add(keyUp);
+	}
 
-    private var curSpawnNote:Int = 0;
+	private var curSpawnNote:Int = 0;
 
-    override function update(elapsed:Float) {
-        super.update(elapsed);
+	override function update(elapsed:Float) {
+		super.update(elapsed);
 
-        var game = PlayState.self;
+		var game = PlayState.self;
 
-        // optimization :D
-        // basically removing shit from arrays can be expensive at times
-        while (curSpawnNote < queuedNotes.length && queuedNotes[curSpawnNote] != null && queuedNotes[curSpawnNote].time - Conductor.songPosition < (1500 / game.CHART.scrollSpeed)) {
-            var queuedNote = queuedNotes[curSpawnNote];
-            var newNote = new Note(queuedNote.id, queuedNote.time, queuedNote.length, !cpu);
-            notes.add(newNote);
-            //trace("note spawned!");
-            curSpawnNote++;
-        }
-        notes.update(elapsed);
-    }
-    
-    //bc notes is an typedGroup and spriteGroups (this) only supports sprites, imma do a scuffed.
-    override function draw() {
-        super.draw();
+		// optimization :D
+		// basically removing shit from arrays can be expensive at times
+		while (curSpawnNote < queuedNotes.length && queuedNotes[curSpawnNote] != null && queuedNotes[curSpawnNote].time - Conductor.songPosition < (1500 / game.CHART.scrollSpeed)) {
+			var queuedNote = queuedNotes[curSpawnNote];
+			var newNote = new Note(queuedNote.id, queuedNote.time, queuedNote.length, !cpu);
+			notes.add(newNote);
+			//trace("note spawned!");
+			curSpawnNote++;
+		}
+		notes.update(elapsed);
+	}
+	
+	//bc notes is an typedGroup and spriteGroups (this) only supports sprites, imma do a scuffed.
+	override function draw() {
+		super.draw();
 
-        notes.cameras = cameras;
-        notes.draw();
-    }
+		notes.cameras = cameras;
+		notes.draw();
+	}
 
-    private function keyDown(keyCode:KeyCode, keyMods:Int) {
-        var strumIndex:Int = -1;
-        for (i => bind in keybinds) {
-            if (bind.contains(keyCode)) {
-                strumIndex = i;
-                break;
-            }
-        }
-        if(strumIndex == -1 || keysHeld[strumIndex] || cpu) return;
-        keysHeld[strumIndex] = true;
+	private function keyDown(keyCode:KeyCode, keyMods:Int) {
+		var strumIndex:Int = -1;
+		for (i => bind in keybinds) {
+			if (bind.contains(keyCode)) {
+				strumIndex = i;
+				break;
+			}
+		}
+		if(strumIndex == -1 || keysHeld[strumIndex] || cpu) return;
+		keysHeld[strumIndex] = true;
 
-        var queuedAnim:String = "press";
-        var strum:Strum = members[strumIndex];
-        strum.playAnim(queuedAnim);
-    }
-    
-    private function keyUp(keyCode:KeyCode, keyMods:Int) {
-        var strumIndex:Int = -1;
-        for (i => bind in keybinds) {
-            if (bind.contains(keyCode)) {
-                strumIndex = i;
-                break;
-            }
-        }
-        if (strumIndex == -1 || !keysHeld[strumIndex] || cpu) return;
-        keysHeld[strumIndex] = false;
+		var queuedAnim:String = "press";
 
-        var strum:Strum = members[strumIndex];
-        strum.playAnim("static");
-    }
+        // LITERALLY THE ENTIRE INPUT SYSTEM WTF from @Ne_Eo
 
-    override function destroy() {
-        Application.current.window.onKeyDown.remove(keyDown);
-        Application.current.window.onKeyUp.remove(keyUp);
-        super.destroy();
-    }
+		var game = PlayState.self;
+		var hitzone = (500 / game.CHART.scrollSpeed);
+
+		// possible press notes
+		var ppnotes = notes.members
+		.filter((v)->v != null) // remove nulls
+		.filter((v)->{
+			return v.id == strumIndex; // filter for only current strum
+		}).filter((v)->{
+			return Math.abs(Conductor.songPosition - v.time) < hitzone; // get notes in hitzone
+		});
+
+        // hit note
+		if (ppnotes.length > 0) {
+			ppnotes.sort((a, b) -> Std.int(a.time - b.time));
+
+			var pppnote = ppnotes[0];
+
+			pppnote.destroy();
+			notes.remove(pppnote);
+
+			queuedAnim = "confirm";
+		}
+
+		var strum:Strum = members[strumIndex];
+		strum.playAnim(queuedAnim);
+	}
+
+	private function keyUp(keyCode:KeyCode, keyMods:Int) {
+		var strumIndex:Int = -1;
+		for (i => bind in keybinds) {
+			if (bind.contains(keyCode)) {
+				strumIndex = i;
+				break;
+			}
+		}
+		if (strumIndex == -1 || !keysHeld[strumIndex] || cpu) return;
+		keysHeld[strumIndex] = false;
+
+		var strum:Strum = members[strumIndex];
+		strum.playAnim("static");
+	}
+
+	override function destroy() {
+		Application.current.window.onKeyDown.remove(keyDown);
+		Application.current.window.onKeyUp.remove(keyUp);
+		super.destroy();
+	}
 }
