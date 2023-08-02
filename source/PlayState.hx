@@ -43,6 +43,7 @@ class PlayState extends FlxState {
 
 		Conductor.mapBPMChanges(CHART);
 		Conductor.bpm = CHART.bpm;
+		Conductor.songPosition = 0;
 		
 		cpuStrums = new StrumLine(FlxG.width * 0.25, 50, true);
 		add(cpuStrums);
