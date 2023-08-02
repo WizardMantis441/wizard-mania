@@ -1,7 +1,9 @@
 package;
 
-import input.*;
 import backend.*;
+import input.*;
+import menus.*;
+
 import flixel.FlxG;
 import flixel.FlxState;
 import flixel.text.FlxText;
@@ -29,15 +31,13 @@ class PlayState extends FlxState {
 	override function create() {
 		super.create();
 		self = this;
+
+		// open "select song" substate
+
 		CHART = ChartParser.parse(song, difficulty);
 
 		Conductor.mapBPMChanges(CHART);
 		Conductor.bpm = CHART.bpm;
-		trace("HEYYYYY " + CHART.bpm);
-
-		Conductor.onStepHit.add(stepHit);
-		Conductor.onBeatHit.add(beatHit);
-		Conductor.onMeasureHit.add(measureHit);
 		
 		cpuStrums = new StrumLine(FlxG.width * 0.25, 50, true);
 		add(cpuStrums);
@@ -64,8 +64,6 @@ class PlayState extends FlxState {
 		inst.loadEmbedded(Paths.songInst(song));
 		FlxG.sound.list.add(inst);
 
-		//Conductor.trackedSound = inst;
-
 		if (Assets.exists(Paths.songVoices(song))) {
 			voices = new FlxSound();
 			voices.loadEmbedded(Paths.songVoices(song));
@@ -75,6 +73,13 @@ class PlayState extends FlxState {
 	
 	override function update(elapsed:Float) {
 		super.update(elapsed);
+
+		if (FlxG.keys.justPressed.ENTER) {
+			inst.pause();
+			voices.pause();
+			openSubState(new Pause());
+		}
+
 		Conductor.songPosition = inst.time;
 		Conductor.updateTime();
 
@@ -90,33 +95,5 @@ class PlayState extends FlxState {
 		debugText.text += "\nStep: " + Conductor.curStep;
 		debugText.text += "\nBeat: " + Conductor.curBeat;
 		debugText.text += "\nMeasure: " + Conductor.curMeasure;
-	}
-
-	
-	/*public function stepHit(curStep:Int) {
-		if(Math.abs(Conductor.songPosition - inst.time) > 100) {
-			if(voices != null) voices.pause();
-	
-			inst.play();
-			Conductor.songPosition = inst.time;
-			if(voices != null) {
-				if (Conductor.songPosition <= voices.length) {
-					voices.time = Conductor.songPosition;
-				}
-				voices.play();
-			}
-		}
-	}*/
-	
-
-	public function stepHit(curStep:Int) {}
-	public function beatHit(curBeat:Int) {}
-	public function measureHit(curMeasure:Int) {}
-	
-	override function destroy() {
-		super.destroy();
-		Conductor.onStepHit.remove(stepHit);
-		Conductor.onBeatHit.remove(stepHit);
-		Conductor.onMeasureHit.remove(stepHit);
 	}
 }

@@ -6,7 +6,6 @@ class CoolUtil {
 	public static var limeKeyCodeFromStringMap(default, null):Map<String, lime.ui.KeyCode> = FlxMacroUtil.buildMap("lime.ui.KeyCode");
 	public static var limeKeyCodeToStringMap(default, null):Map<lime.ui.KeyCode, String> = FlxMacroUtil.buildMap("lime.ui.KeyCode", true);
 
-
 	/**
 	 * Converts an `FlxKey` to a string representation.
 	 * 
