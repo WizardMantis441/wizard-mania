@@ -13,8 +13,8 @@ import openfl.utils.Assets;
 class PlayState extends FlxState {
 	public static var self:PlayState;
 
-	public var song:String = "quad quarrel";
-	public var difficulty:String = "hard";
+	static var song:String = SelectSong.listInfo[SelectSong.curSelected][0];
+	static var difficulty:String = SelectSong.listInfo[SelectSong.curSelected][1];
 	
 	public var CHART:ChartFormat;
 
@@ -31,8 +31,6 @@ class PlayState extends FlxState {
 	override function create() {
 		super.create();
 		self = this;
-
-		// open "select song" substate
 
 		CHART = ChartParser.parse(song, difficulty);
 

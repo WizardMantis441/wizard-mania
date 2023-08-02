@@ -9,6 +9,6 @@ class Main extends Sprite {
 		super();
 
 		FlxSprite.defaultAntialiasing = true;
-		addChild(new FlxGame(0, 0, PlayState, 240, 240, true));
+		addChild(new FlxGame(0, 0, SelectSong, 240, 240, true));
 	}
 }
