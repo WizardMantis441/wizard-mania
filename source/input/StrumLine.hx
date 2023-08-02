@@ -100,21 +100,29 @@ class StrumLine extends FlxTypedSpriteGroup<Strum> {
 		var queuedAnim:String = "press";
 
         // LITERALLY THE ENTIRE INPUT SYSTEM WTF from @Ne_Eo
+		// sword and srt cleaned it up :3
+		//                      ~ sword
  
 		var game = PlayState.self;
 		var hitzone = (500 / game.CHART.scrollSpeed);
-
-		var ppnotes = notes.members // possible press notes
-		.filter((n)-> n != null) // remove null notes
-		.filter((n)-> n.id == strumIndex) // check only cur strum
-		.filter((n)-> Math.abs(Conductor.songPosition - n.time) < hitzone); // only in hitzone
-
-		if (ppnotes.length > 0) { // hit note
-			ppnotes.sort((a, b) -> Std.int(a.time - b.time));
 		
-			for (b in ppnotes.filter(v->Math.abs(ppnotes[0].time - v.time) < 5)) {
-				b.destroy();
-				notes.remove(b);
+		// possible press notes
+		var possibleNotes = notes.members.filter((note) -> {
+			return note != null 											// remove null notes
+				&& note.id == strumIndex 									// check only cur strum
+				&& Math.abs(Conductor.songPosition - note.time) < hitzone; 	// only in hitzone
+		});
+
+		if (possibleNotes.length > 0) { // hit note
+			possibleNotes.sort((a, b) -> Std.int(a.time - b.time));
+		
+			var toClear = possibleNotes.filter((note) -> {
+				return Math.abs(possibleNotes[0].time - note.time) < 5;
+			});
+
+			for (note in toClear) {
+				note.destroy();
+				notes.remove(note);
 			}
 		
 			queuedAnim = "confirm";
