@@ -68,6 +68,7 @@ class PlayState extends FlxState {
 
 		inst = new FlxSound();
 		inst.loadEmbedded(Paths.songInst(song));
+		inst.onComplete = function() FlxG.switchState(new SelectSong());
 		FlxG.sound.list.add(inst);
 
 		if (Assets.exists(Paths.songVoices(song))) {

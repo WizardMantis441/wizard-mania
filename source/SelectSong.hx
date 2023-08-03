@@ -13,6 +13,8 @@ class SelectSong extends FlxState {
     var list:Array<String> = [];
     var listInfo:Array<Array<String>> = [];
     var songTxts:Array<FlxText> = [];
+    
+    var loading:FlxText;
 
     override function create() {
         super.create();
@@ -33,14 +35,21 @@ class SelectSong extends FlxState {
         }
 
         changeSelction(0);
+
+        loading = new FlxText(0, 0, 0, "", 12);
+        loading.screenCenter();
+        loading.y = 700;
+        add(loading);
     }
 
     override function update(elapsed:Float) {
         if (FlxG.keys.justPressed.UP) changeSelction(-1);
         if (FlxG.keys.justPressed.DOWN) changeSelction(1);
         
-        if (FlxG.keys.justPressed.ENTER) 
+        if (FlxG.keys.justPressed.ENTER) {
+            loading.text = 'Loading ${listInfo[curSelected][0].toUpperCase()} (${listInfo[curSelected][1].toUpperCase()})';
             FlxG.switchState(new PlayState(listInfo[curSelected][0], listInfo[curSelected][1]));
+        }
     }
 
     function changeSelction(inc:Int) {
