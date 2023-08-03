@@ -28,7 +28,7 @@ class StrumLine extends FlxTypedSpriteGroup<Strum> {
 	public var cpu:Bool = false;
 	public var keybinds:Array<Array<KeyCode>> = [];
 	public var keysHeld:Array<Bool> = [false, false, false, false];
-	
+
 	public var spacing:Float = 112; // 160 * 0.7
 
 	public function new(?x:Float = 0, ?y:Float = 0, ?cpu:Bool = false) {
@@ -77,7 +77,7 @@ class StrumLine extends FlxTypedSpriteGroup<Strum> {
 		}
 		notes.update(elapsed);
 	}
-	
+
 	//bc notes is an typedGroup and spriteGroups (this) only supports sprites, imma do a scuffed.
 	override function draw() {
 		super.draw();
@@ -99,13 +99,13 @@ class StrumLine extends FlxTypedSpriteGroup<Strum> {
 
 		var queuedAnim:String = "press";
 
-        // LITERALLY THE ENTIRE INPUT SYSTEM WTF from @Ne_Eo
+		// LITERALLY THE ENTIRE INPUT SYSTEM WTF from @Ne_Eo
 		// sword and srt cleaned it up :3
 		//                      ~ sword
- 
+
 		var game = PlayState.self;
 		var hitzone = (500 / game.CHART.scrollSpeed);
-		
+
 		// possible press notes
 		var possibleNotes = notes.members.filter((note) -> {
 			return note != null 											// remove null notes
@@ -115,7 +115,7 @@ class StrumLine extends FlxTypedSpriteGroup<Strum> {
 
 		if (possibleNotes.length > 0) { // hit note
 			possibleNotes.sort((a, b) -> Std.int(a.time - b.time));
-		
+
 			var toClear = possibleNotes.filter((note) -> {
 				return Math.abs(possibleNotes[0].time - note.time) < 5;
 			});
@@ -124,7 +124,7 @@ class StrumLine extends FlxTypedSpriteGroup<Strum> {
 				note.destroy();
 				notes.remove(note);
 			}
-		
+
 			queuedAnim = "confirm";
 		}
 

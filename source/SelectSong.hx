@@ -8,53 +8,53 @@ import sys.FileSystem;
 
 class SelectSong extends FlxState {
 
-    var curSelected:Int = 0;
+	var curSelected:Int = 0;
 
-    var list:Array<String> = [];
-    var listInfo:Array<Array<String>> = [];
-    var songTxts:Array<FlxText> = [];
-    
-    var loading:FlxText;
+	var list:Array<String> = [];
+	var listInfo:Array<Array<String>> = [];
+	var songTxts:Array<FlxText> = [];
 
-    override function create() {
-        super.create();
+	var loading:FlxText;
 
-        for (folders in FileSystem.readDirectory("assets/songs")) {
-            for (charts in FileSystem.readDirectory("assets/songs/" + folders)) {
-                if (StringTools.endsWith(charts, ".json")) {
-                    list.push(folders + "/" + charts);
-                    listInfo.push([folders, StringTools.replace(charts, ".json", "")]);
-                }
-            }
-        }
+	override function create() {
+		super.create();
 
-        for (i in 0...list.length) {
-            var item:FlxText = new FlxText(20, 20 + 28 * i, 0, list[i], 24);
-            songTxts.push(item);
-            add(item);
-        }
+		for (folders in FileSystem.readDirectory("assets/songs")) {
+			for (charts in FileSystem.readDirectory("assets/songs/" + folders)) {
+				if (StringTools.endsWith(charts, ".json")) {
+					list.push(folders + "/" + charts);
+					listInfo.push([folders, StringTools.replace(charts, ".json", "")]);
+				}
+			}
+		}
 
-        changeSelction(0);
+		for (i in 0...list.length) {
+			var item:FlxText = new FlxText(20, 20 + 28 * i, 0, list[i], 24);
+			songTxts.push(item);
+			add(item);
+		}
 
-        loading = new FlxText(0, 0, 0, "", 12);
-        loading.screenCenter();
-        loading.y = 700;
-        add(loading);
-    }
+		changeSelction(0);
 
-    override function update(elapsed:Float) {
-        if (FlxG.keys.justPressed.UP) changeSelction(-1);
-        if (FlxG.keys.justPressed.DOWN) changeSelction(1);
-        
-        if (FlxG.keys.justPressed.ENTER) {
-            loading.text = 'Loading ${listInfo[curSelected][0].toUpperCase()} (${listInfo[curSelected][1].toUpperCase()})';
-            FlxG.switchState(new PlayState(listInfo[curSelected][0], listInfo[curSelected][1]));
-        }
-    }
+		loading = new FlxText(0, 0, 0, "", 12);
+		loading.screenCenter();
+		loading.y = 700;
+		add(loading);
+	}
 
-    function changeSelction(inc:Int) {
-        songTxts[curSelected].color = 0xFFFFFFFF;
-        curSelected = FlxMath.wrap(curSelected + inc, 0, list.length - 1);
-        songTxts[curSelected].color = 0xFF00FF40;
-    }
+	override function update(elapsed:Float) {
+		if (FlxG.keys.justPressed.UP) changeSelction(-1);
+		if (FlxG.keys.justPressed.DOWN) changeSelction(1);
+
+		if (FlxG.keys.justPressed.ENTER) {
+			loading.text = 'Loading ${listInfo[curSelected][0].toUpperCase()} (${listInfo[curSelected][1].toUpperCase()})';
+			FlxG.switchState(new PlayState(listInfo[curSelected][0], listInfo[curSelected][1]));
+		}
+	}
+
+	function changeSelction(inc:Int) {
+		songTxts[curSelected].color = 0xFFFFFFFF;
+		curSelected = FlxMath.wrap(curSelected + inc, 0, list.length - 1);
+		songTxts[curSelected].color = 0xFF00FF40;
+	}
 }

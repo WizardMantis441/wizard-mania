@@ -15,7 +15,7 @@ class PlayState extends FlxState {
 
 	public var song:String;
 	public var difficulty:String;
-	
+
 	public var CHART:ChartFormat;
 
 	public var inst:FlxSound;
@@ -25,7 +25,7 @@ class PlayState extends FlxState {
 
 	public var cpuStrums:StrumLine;
 	public var playerStrums:StrumLine;
-	
+
 	public var debugText:FlxText;
 
 	public function new(song:String, diff:String) {
@@ -34,7 +34,7 @@ class PlayState extends FlxState {
 		this.song = song;
 		this.difficulty = diff;
 	}
-	
+
 	override function create() {
 		super.create();
 		self = this;
@@ -44,10 +44,10 @@ class PlayState extends FlxState {
 		Conductor.mapBPMChanges(CHART);
 		Conductor.bpm = CHART.bpm;
 		Conductor.songPosition = 0;
-		
+
 		cpuStrums = new StrumLine(FlxG.width * 0.25, 50, true);
 		add(cpuStrums);
-		
+
 		playerStrums = new StrumLine(FlxG.width * 0.75, 50, false);
 		add(playerStrums);
 
@@ -61,7 +61,7 @@ class PlayState extends FlxState {
 		for (strumLine in [cpuStrums, playerStrums]) {
 			strumLine.queuedNotes.sort((a, b) -> Std.int(a.time - b.time));
 		}
-		
+
 		debugText = new FlxText(3, 3, 0, "", 20);
 		debugText.alpha /= 3;
 		add(debugText);
@@ -77,7 +77,7 @@ class PlayState extends FlxState {
 			FlxG.sound.list.add(voices);
 		}
 	}
-	
+
 	override function update(elapsed:Float) {
 		super.update(elapsed);
 
